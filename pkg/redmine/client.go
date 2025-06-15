@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -16,6 +17,9 @@ type Client struct {
 }
 
 func NewClient(baseURL, apiKey string) *Client {
+	// URLの末尾のスラッシュを除去
+	baseURL = strings.TrimRight(baseURL, "/")
+	
 	return &Client{
 		BaseURL: baseURL,
 		APIKey:  apiKey,
@@ -31,7 +35,8 @@ func (c *Client) doRequest(method, path string, params url.Values) ([]byte, erro
 		return nil, fmt.Errorf("invalid base URL: %w", err)
 	}
 
-	u.Path = path
+	// パスを結合
+	u.Path = strings.TrimRight(u.Path, "/") + path
 	if params != nil {
 		u.RawQuery = params.Encode()
 	}
@@ -43,6 +48,7 @@ func (c *Client) doRequest(method, path string, params url.Values) ([]byte, erro
 
 	req.Header.Set("X-Redmine-API-Key", c.APIKey)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -55,8 +61,22 @@ func (c *Client) doRequest(method, path string, params url.Values) ([]byte, erro
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
 
+	// エラーハンドリング
+	if resp.StatusCode == 401 {
+		return nil, fmt.Errorf("authentication failed: invalid API key or unauthorized access\nURL: %s", u.String())
+	}
+	
+	if resp.StatusCode == 404 {
+		return nil, fmt.Errorf("not found: the requested resource does not exist\nURL: %s", u.String())
+	}
+	
+	// HTMLが返ってきた場合（JSONではない）
+	if strings.HasPrefix(strings.TrimSpace(string(body)), "<") {
+		return nil, fmt.Errorf("invalid response: expected JSON but got HTML. Please check your REDMINE_URL is correct and includes the protocol (http:// or https://)\nURL: %s", u.String())
+	}
+	
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("API error: %s (status %d)", string(body), resp.StatusCode)
+		return nil, fmt.Errorf("API error (status %d): %s\nURL: %s", resp.StatusCode, string(body), u.String())
 	}
 
 	return body, nil
