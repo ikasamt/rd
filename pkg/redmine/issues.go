@@ -62,3 +62,21 @@ func (c *Client) GetIssue(id int, includeJournals bool) (*Issue, error) {
 
 	return &response.Issue, nil
 }
+
+func (c *Client) CreateIssue(issue *IssueCreate) (*Issue, error) {
+	req := IssueCreateRequest{Issue: *issue}
+	
+	var response IssueResponse
+	if err := c.Post("/issues.json", nil, req, &response); err != nil {
+		return nil, err
+	}
+
+	return &response.Issue, nil
+}
+
+func (c *Client) UpdateIssue(id int, update *IssueUpdate) error {
+	path := fmt.Sprintf("/issues/%d.json", id)
+	req := IssueUpdateRequest{Issue: *update}
+	
+	return c.Put(path, nil, req)
+}

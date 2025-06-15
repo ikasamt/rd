@@ -78,3 +78,53 @@ type Detail struct {
 	OldValue string `json:"old_value"`
 	NewValue string `json:"new_value"`
 }
+
+// チケット作成用の構造体
+type IssueCreate struct {
+	ProjectID      int                    `json:"project_id"`
+	TrackerID      int                    `json:"tracker_id,omitempty"`
+	StatusID       int                    `json:"status_id,omitempty"`
+	PriorityID     int                    `json:"priority_id,omitempty"`
+	Subject        string                 `json:"subject"`
+	Description    string                 `json:"description,omitempty"`
+	CategoryID     int                    `json:"category_id,omitempty"`
+	AssignedToID   int                    `json:"assigned_to_id,omitempty"`
+	ParentIssueID  int                    `json:"parent_issue_id,omitempty"`
+	CustomFields   []CustomFieldValue     `json:"custom_fields,omitempty"`
+	WatcherUserIDs []int                  `json:"watcher_user_ids,omitempty"`
+	StartDate      string                 `json:"start_date,omitempty"`
+	DueDate        string                 `json:"due_date,omitempty"`
+	EstimatedHours float64                `json:"estimated_hours,omitempty"`
+	DoneRatio      int                    `json:"done_ratio,omitempty"`
+}
+
+type CustomFieldValue struct {
+	ID    int         `json:"id"`
+	Value interface{} `json:"value"`
+}
+
+type IssueCreateRequest struct {
+	Issue IssueCreate `json:"issue"`
+}
+
+// チケット更新用の構造体
+type IssueUpdate struct {
+	Subject        *string                `json:"subject,omitempty"`
+	Description    *string                `json:"description,omitempty"`
+	StatusID       *int                   `json:"status_id,omitempty"`
+	PriorityID     *int                   `json:"priority_id,omitempty"`
+	AssignedToID   *int                   `json:"assigned_to_id,omitempty"`
+	CategoryID     *int                   `json:"category_id,omitempty"`
+	TrackerID      *int                   `json:"tracker_id,omitempty"`
+	ParentIssueID  *int                   `json:"parent_issue_id,omitempty"`
+	CustomFields   []CustomFieldValue     `json:"custom_fields,omitempty"`
+	StartDate      *string                `json:"start_date,omitempty"`
+	DueDate        *string                `json:"due_date,omitempty"`
+	EstimatedHours *float64               `json:"estimated_hours,omitempty"`
+	DoneRatio      *int                   `json:"done_ratio,omitempty"`
+	Notes          string                 `json:"notes,omitempty"`
+}
+
+type IssueUpdateRequest struct {
+	Issue IssueUpdate `json:"issue"`
+}

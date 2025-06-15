@@ -1,6 +1,7 @@
 package redmine
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -29,7 +30,7 @@ func NewClient(baseURL, apiKey string) *Client {
 	}
 }
 
-func (c *Client) doRequest(method, path string, params url.Values) ([]byte, error) {
+func (c *Client) doRequest(method, path string, params url.Values, body interface{}) ([]byte, error) {
 	u, err := url.Parse(c.BaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("invalid base URL: %w", err)
@@ -41,7 +42,16 @@ func (c *Client) doRequest(method, path string, params url.Values) ([]byte, erro
 		u.RawQuery = params.Encode()
 	}
 
-	req, err := http.NewRequest(method, u.String(), nil)
+	var bodyReader io.Reader
+	if body != nil {
+		jsonBody, err := json.Marshal(body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+		}
+		bodyReader = bytes.NewReader(jsonBody)
+	}
+
+	req, err := http.NewRequest(method, u.String(), bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -56,7 +66,7 @@ func (c *Client) doRequest(method, path string, params url.Values) ([]byte, erro
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
@@ -71,19 +81,19 @@ func (c *Client) doRequest(method, path string, params url.Values) ([]byte, erro
 	}
 	
 	// HTMLが返ってきた場合（JSONではない）
-	if strings.HasPrefix(strings.TrimSpace(string(body)), "<") {
+	if strings.HasPrefix(strings.TrimSpace(string(respBody)), "<") {
 		return nil, fmt.Errorf("invalid response: expected JSON but got HTML. Please check your REDMINE_URL is correct and includes the protocol (http:// or https://)\nURL: %s", u.String())
 	}
 	
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("API error (status %d): %s\nURL: %s", resp.StatusCode, string(body), u.String())
+		return nil, fmt.Errorf("API error (status %d): %s\nURL: %s", resp.StatusCode, string(respBody), u.String())
 	}
 
-	return body, nil
+	return respBody, nil
 }
 
 func (c *Client) Get(path string, params url.Values, result interface{}) error {
-	body, err := c.doRequest("GET", path, params)
+	body, err := c.doRequest("GET", path, params, nil)
 	if err != nil {
 		return err
 	}
@@ -93,4 +103,24 @@ func (c *Client) Get(path string, params url.Values, result interface{}) error {
 	}
 
 	return nil
+}
+
+func (c *Client) Post(path string, params url.Values, reqBody interface{}, result interface{}) error {
+	body, err := c.doRequest("POST", path, params, reqBody)
+	if err != nil {
+		return err
+	}
+
+	if result != nil && len(body) > 0 {
+		if err := json.Unmarshal(body, result); err != nil {
+			return fmt.Errorf("failed to decode response: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (c *Client) Put(path string, params url.Values, reqBody interface{}) error {
+	_, err := c.doRequest("PUT", path, params, reqBody)
+	return err
 }
