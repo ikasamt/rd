@@ -29,6 +29,7 @@ var commentCmd = &cobra.Command{
 
 		urlFlag, _ := cmd.Root().Flags().GetString("url")
 		keyFlag, _ := cmd.Root().Flags().GetString("key")
+		debugFlag, _ := cmd.Root().Flags().GetBool("debug")
 		
 		cfg, err := config.Load(urlFlag, keyFlag)
 		if err != nil {
@@ -36,6 +37,7 @@ var commentCmd = &cobra.Command{
 		}
 
 		client := redmine.NewClient(cfg.RedmineURL, cfg.APIKey)
+		client.Debug = debugFlag
 
 		// コメントだけの更新
 		update := &redmine.IssueUpdate{

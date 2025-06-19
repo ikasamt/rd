@@ -26,6 +26,7 @@ var getCmd = &cobra.Command{
 
 		urlFlag, _ := cmd.Root().Flags().GetString("url")
 		keyFlag, _ := cmd.Root().Flags().GetString("key")
+		debugFlag, _ := cmd.Root().Flags().GetBool("debug")
 		
 		cfg, err := config.Load(urlFlag, keyFlag)
 		if err != nil {
@@ -33,6 +34,7 @@ var getCmd = &cobra.Command{
 		}
 
 		client := redmine.NewClient(cfg.RedmineURL, cfg.APIKey)
+		client.Debug = debugFlag
 
 		includeComments, _ := cmd.Flags().GetBool("comments")
 		issue, err := client.GetIssue(issueID, includeComments)

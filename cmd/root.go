@@ -30,4 +30,5 @@ func init() {
 	rootCmd.PersistentFlags().Bool("json", false, "Output in JSON format")
 	rootCmd.PersistentFlags().Bool("quiet", false, "Minimal output")
 	rootCmd.PersistentFlags().Bool("verbose", false, "Verbose output")
+	rootCmd.PersistentFlags().Bool("debug", false, "Debug mode - show HTTP request URLs")
 }

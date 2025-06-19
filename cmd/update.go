@@ -23,6 +23,7 @@ var updateCmd = &cobra.Command{
 
 		urlFlag, _ := cmd.Root().Flags().GetString("url")
 		keyFlag, _ := cmd.Root().Flags().GetString("key")
+		debugFlag, _ := cmd.Root().Flags().GetBool("debug")
 		
 		cfg, err := config.Load(urlFlag, keyFlag)
 		if err != nil {
@@ -30,6 +31,7 @@ var updateCmd = &cobra.Command{
 		}
 
 		client := redmine.NewClient(cfg.RedmineURL, cfg.APIKey)
+		client.Debug = debugFlag
 
 		update := &redmine.IssueUpdate{}
 		hasUpdate := false
@@ -80,6 +82,24 @@ var updateCmd = &cobra.Command{
 			hasUpdate = true
 		}
 
+		// 対象バージョン更新
+		if version, _ := cmd.Flags().GetString("version"); version != "" {
+			// まず現在のチケット情報を取得してプロジェクトIDを特定
+			currentIssue, err := client.GetIssue(issueID, false)
+			if err != nil {
+				return fmt.Errorf("failed to get current issue: %w", err)
+			}
+			
+			projectID := fmt.Sprintf("%d", currentIssue.Project.ID)
+			versionObj, err := client.FindVersionByName(projectID, version)
+			if err != nil {
+				return fmt.Errorf("failed to find version: %w", err)
+			}
+			
+			update.FixedVersionID = &versionObj.ID
+			hasUpdate = true
+		}
+
 		// コメント追加
 		if note, _ := cmd.Flags().GetString("note"); note != "" {
 			update.Notes = note
@@ -126,6 +146,7 @@ func init() {
 	updateCmd.Flags().Int("done-ratio", 0, "Update done ratio (0-100)")
 	updateCmd.Flags().String("start-date", "", "Update start date (YYYY-MM-DD)")
 	updateCmd.Flags().String("due-date", "", "Update due date (YYYY-MM-DD)")
+	updateCmd.Flags().String("version", "", "Update target version (version name)")
 	updateCmd.Flags().String("note", "", "Add a note/comment")
 	updateCmd.Flags().StringSlice("field", []string{}, "Update custom field (format: name=value)")
 	updateCmd.Flags().Bool("interactive", false, "Interactive mode")

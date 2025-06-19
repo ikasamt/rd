@@ -117,6 +117,7 @@ type IssueUpdate struct {
 	CategoryID     *int                   `json:"category_id,omitempty"`
 	TrackerID      *int                   `json:"tracker_id,omitempty"`
 	ParentIssueID  *int                   `json:"parent_issue_id,omitempty"`
+	FixedVersionID *int                   `json:"fixed_version_id,omitempty"`
 	CustomFields   []CustomFieldValue     `json:"custom_fields,omitempty"`
 	StartDate      *string                `json:"start_date,omitempty"`
 	DueDate        *string                `json:"due_date,omitempty"`

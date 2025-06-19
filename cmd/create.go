@@ -20,6 +20,7 @@ var createCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		urlFlag, _ := cmd.Root().Flags().GetString("url")
 		keyFlag, _ := cmd.Root().Flags().GetString("key")
+		debugFlag, _ := cmd.Root().Flags().GetBool("debug")
 		
 		cfg, err := config.Load(urlFlag, keyFlag)
 		if err != nil {
@@ -27,6 +28,7 @@ var createCmd = &cobra.Command{
 		}
 
 		client := redmine.NewClient(cfg.RedmineURL, cfg.APIKey)
+		client.Debug = debugFlag
 
 		interactive, _ := cmd.Flags().GetBool("interactive")
 		if interactive {

@@ -15,6 +15,7 @@ type Client struct {
 	BaseURL    string
 	APIKey     string
 	HTTPClient *http.Client
+	Debug      bool
 }
 
 func NewClient(baseURL, apiKey string) *Client {
@@ -59,6 +60,10 @@ func (c *Client) doRequest(method, path string, params url.Values, body interfac
 	req.Header.Set("X-Redmine-API-Key", c.APIKey)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
+
+	if c.Debug {
+		fmt.Printf("[DEBUG] %s %s\n", method, u.String())
+	}
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {

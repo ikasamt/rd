@@ -19,6 +19,7 @@ var listCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		urlFlag, _ := cmd.Root().Flags().GetString("url")
 		keyFlag, _ := cmd.Root().Flags().GetString("key")
+		debugFlag, _ := cmd.Root().Flags().GetBool("debug")
 		
 		cfg, err := config.Load(urlFlag, keyFlag)
 		if err != nil {
@@ -26,6 +27,7 @@ var listCmd = &cobra.Command{
 		}
 
 		client := redmine.NewClient(cfg.RedmineURL, cfg.APIKey)
+		client.Debug = debugFlag
 
 		// フィルタの設定
 		filter := &redmine.IssueFilter{}
