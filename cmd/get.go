@@ -36,8 +36,8 @@ var getCmd = &cobra.Command{
 		client := redmine.NewClient(cfg.RedmineURL, cfg.APIKey)
 		client.Debug = debugFlag
 
-		includeComments, _ := cmd.Flags().GetBool("comments")
-		issue, err := client.GetIssue(issueID, includeComments)
+		noComments, _ := cmd.Flags().GetBool("no-comments")
+		issue, err := client.GetIssue(issueID, !noComments)
 		if err != nil {
 			return fmt.Errorf("failed to get issue: %w", err)
 		}
@@ -120,6 +120,6 @@ func printIssueDetail(issue *redmine.Issue) error {
 func init() {
 	rootCmd.AddCommand(getCmd)
 
-	getCmd.Flags().Bool("comments", false, "Include comments")
+	getCmd.Flags().Bool("no-comments", false, "Exclude comments")
 	getCmd.Flags().Bool("fields", false, "Include custom fields")
 }

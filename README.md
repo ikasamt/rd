@@ -10,11 +10,30 @@ go install github.com/ikasamt/rd@latest
 
 ## Configuration
 
-Set the following environment variables:
+You can configure rd via flags, environment variables, or a `.rd` file.
+
+Priority: flags > env vars > `.rd` in CWD > `.rd` at Git root > `~/.rd`.
+
+Environment variables:
 
 ```bash
 export REDMINE_API_KEY="your-api-key"
 export REDMINE_URL="https://your-redmine-instance.com"
+```
+
+Optional `.rd` file (key=value):
+
+```
+# .rd
+REDMINE_URL=https://your-redmine-instance.com
+REDMINE_API_KEY=your-api-key
+```
+
+You can also use short keys in `.rd`:
+
+```
+url=https://your-redmine-instance.com
+key=your-api-key
 ```
 
 ## Usage

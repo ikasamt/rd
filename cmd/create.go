@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/ikasamt/rd/pkg/config"
 	"github.com/ikasamt/rd/pkg/redmine"
@@ -103,13 +102,9 @@ func createIssueFromFlags(cmd *cobra.Command, client *redmine.Client) error {
 	// カスタムフィールド
 	fields, _ := cmd.Flags().GetStringSlice("field")
 	if len(fields) > 0 {
-		customFields := []redmine.CustomFieldValue{}
-		for _, field := range fields {
-			parts := strings.SplitN(field, "=", 2)
-			if len(parts) == 2 {
-				// TODO: カスタムフィールドIDの解決
-				// 現在は仮実装
-			}
+		customFields, err := resolveCustomFields(client, fields)
+		if err != nil {
+			return err
 		}
 		if len(customFields) > 0 {
 			issue.CustomFields = customFields

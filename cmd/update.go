@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/ikasamt/rd/pkg/config"
 	"github.com/ikasamt/rd/pkg/redmine"
@@ -48,12 +47,13 @@ var updateCmd = &cobra.Command{
 		// 担当者更新
 		if assignee, _ := cmd.Flags().GetString("assign"); assignee != "" {
 			if assignee == "me" {
-				// TODO: 現在のユーザーIDを取得
-				assigneeID := 1 // 仮実装
-				update.AssignedToID = &assigneeID
+				currentUser, err := client.GetCurrentUser()
+				if err != nil {
+					return fmt.Errorf("failed to get current user: %w", err)
+				}
+				update.AssignedToID = &currentUser.ID
 			} else if id, err := strconv.Atoi(assignee); err == nil {
-				assigneeID := id
-				update.AssignedToID = &assigneeID
+				update.AssignedToID = &id
 			}
 			hasUpdate = true
 		}
@@ -109,13 +109,9 @@ var updateCmd = &cobra.Command{
 		// カスタムフィールド更新
 		fields, _ := cmd.Flags().GetStringSlice("field")
 		if len(fields) > 0 {
-			customFields := []redmine.CustomFieldValue{}
-			for _, field := range fields {
-				parts := strings.SplitN(field, "=", 2)
-				if len(parts) == 2 {
-					// TODO: カスタムフィールドIDの解決
-					// 現在は仮実装
-				}
+			customFields, err := resolveCustomFields(client, fields)
+			if err != nil {
+				return err
 			}
 			if len(customFields) > 0 {
 				update.CustomFields = customFields

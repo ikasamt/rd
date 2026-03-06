@@ -25,10 +25,10 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().String("url", "", "Redmine URL (overrides REDMINE_URL)")
-	rootCmd.PersistentFlags().String("key", "", "Redmine API key (overrides REDMINE_API_KEY)")
-	rootCmd.PersistentFlags().Bool("json", false, "Output in JSON format")
-	rootCmd.PersistentFlags().Bool("quiet", false, "Minimal output")
-	rootCmd.PersistentFlags().Bool("verbose", false, "Verbose output")
-	rootCmd.PersistentFlags().Bool("debug", false, "Debug mode - show HTTP request URLs")
+    rootCmd.PersistentFlags().String("url", "", "Redmine URL (overrides REDMINE_URL and .rd)")
+    rootCmd.PersistentFlags().String("key", "", "Redmine API key (overrides REDMINE_API_KEY and .rd)")
+    rootCmd.PersistentFlags().Bool("json", false, "Output in JSON format")
+    rootCmd.PersistentFlags().Bool("quiet", false, "Minimal output")
+    rootCmd.PersistentFlags().Bool("verbose", false, "Verbose output")
+    rootCmd.PersistentFlags().Bool("debug", false, "Debug mode - show HTTP request URLs")
 }

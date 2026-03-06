@@ -36,4 +36,5 @@ Thumbs.db
 .env.local
 
 # Config files (for local development)
+.rd
 .rdconfig
