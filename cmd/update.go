@@ -100,6 +100,12 @@ var updateCmd = &cobra.Command{
 			hasUpdate = true
 		}
 
+		// 説明更新
+		if description, _ := cmd.Flags().GetString("description"); cmd.Flags().Changed("description") {
+			update.Description = &description
+			hasUpdate = true
+		}
+
 		// コメント追加
 		if note, _ := cmd.Flags().GetString("note"); note != "" {
 			update.Notes = note
@@ -143,6 +149,7 @@ func init() {
 	updateCmd.Flags().String("start-date", "", "Update start date (YYYY-MM-DD)")
 	updateCmd.Flags().String("due-date", "", "Update due date (YYYY-MM-DD)")
 	updateCmd.Flags().String("version", "", "Update target version (version name)")
+	updateCmd.Flags().String("description", "", "Update description")
 	updateCmd.Flags().String("note", "", "Add a note/comment")
 	updateCmd.Flags().StringSlice("field", []string{}, "Update custom field (format: name=value)")
 	updateCmd.Flags().Bool("interactive", false, "Interactive mode")

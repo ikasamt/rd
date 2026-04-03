@@ -38,27 +38,79 @@ key=your-api-key
 
 ## Usage
 
+### List issues
+
 ```bash
-# List tickets
 rd list
+rd list --project myproject --status open --assignee me
+rd list --oneline
+rd list --csv
+rd list --json
+```
 
-# Get ticket details
-rd get <ticket-id>
+### Get issue details
 
-# Create a new ticket
-rd create --title "New feature" --description "Description"
+```bash
+rd get 123
+rd get 123 --no-comments
+rd get 123 --json
+```
 
-# Update ticket status
-rd update <ticket-id> --status "In Progress"
+### Create issue
+
+```bash
+rd create --project myproject --title "Bug report" --description "Details here"
+rd create --project myproject --title "Task" --tracker 2 --priority 3 --assignee 5
+rd create --project myproject --title "With custom field" --field "Field Name=value"
+rd create --interactive
+```
+
+### Update issue
+
+```bash
+rd update 123 --status 2
+rd update 123 --assign me
+rd update 123 --description "Updated description"
+rd update 123 --priority 3 --done-ratio 50
+rd update 123 --version "v1.0" --due-date 2025-12-31
+rd update 123 --field "Custom Field=value"
+rd update 123 --note "Progress update"
+```
+
+### Add comment
+
+```bash
+rd comment 123 "This is a comment"
+```
+
+### Search
+
+```bash
+rd search "keyword"
+rd search "keyword" --all-types
+rd search "keyword" --wiki --titles-only
+rd search "keyword" --all --oneline
+rd search "keyword" --json
+```
+
+### Global flags
+
+```bash
+rd --url https://redmine.example.com --key YOUR_API_KEY list
+rd --json list
+rd --debug get 123
 ```
 
 ## Features
 
 - Simple and intuitive command structure
-- Full support for custom fields
+- Full support for custom fields (name-based resolution)
 - JSON output for integration with Claude Code
-- Interactive mode for guided operations
-- Configuration file support for customization
+- Interactive mode for issue creation
+- Flexible configuration (flags, env vars, `.rd` file)
+- Version name resolution for `--version` flag
+- `--assign me` resolves current user automatically
+- Search across issues, wiki, news, documents, and more
 
 ## License
 
