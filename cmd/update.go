@@ -100,6 +100,12 @@ var updateCmd = &cobra.Command{
 			hasUpdate = true
 		}
 
+		// 親チケット更新
+		if parentID, _ := cmd.Flags().GetInt("parent"); cmd.Flags().Changed("parent") {
+			update.ParentIssueID = &parentID
+			hasUpdate = true
+		}
+
 		// 説明更新
 		if description, _ := cmd.Flags().GetString("description"); cmd.Flags().Changed("description") {
 			update.Description = &description
@@ -149,6 +155,7 @@ func init() {
 	updateCmd.Flags().String("start-date", "", "Update start date (YYYY-MM-DD)")
 	updateCmd.Flags().String("due-date", "", "Update due date (YYYY-MM-DD)")
 	updateCmd.Flags().String("version", "", "Update target version (version name)")
+	updateCmd.Flags().Int("parent", 0, "Set parent issue ID (0 to remove)")
 	updateCmd.Flags().String("description", "", "Update description")
 	updateCmd.Flags().String("note", "", "Add a note/comment")
 	updateCmd.Flags().StringSlice("field", []string{}, "Update custom field (format: name=value)")

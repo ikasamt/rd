@@ -50,6 +50,11 @@ var listCmd = &cobra.Command{
 			filter.AssignedTo = assignee
 		}
 
+		parent, _ := cmd.Flags().GetString("parent")
+		if parent != "" {
+			filter.ParentID = parent
+		}
+
 		// 取得
 		issues, err := client.ListIssues(filter)
 		if err != nil {
@@ -145,6 +150,7 @@ func init() {
 	listCmd.Flags().String("status", "", "Filter by status")
 	listCmd.Flags().String("assignee", "", "Filter by assignee")
 	listCmd.Flags().StringSlice("field", []string{}, "Filter by custom field (format: name=value)")
+	listCmd.Flags().String("parent", "", "Filter by parent issue ID")
 	listCmd.Flags().Bool("oneline", false, "Display in one line format")
 	listCmd.Flags().Bool("csv", false, "Output in CSV format")
 }

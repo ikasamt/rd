@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type IssueFilter struct {
 	ProjectID  string
 	StatusID   string
 	AssignedTo string
+	ParentID   string
 	Limit      int
 	Offset     int
 }
@@ -26,6 +28,9 @@ func (c *Client) ListIssues(filter *IssueFilter) (*IssuesResponse, error) {
 		}
 		if filter.AssignedTo != "" {
 			params.Set("assigned_to_id", filter.AssignedTo)
+		}
+		if filter.ParentID != "" {
+			params.Set("parent_id", filter.ParentID)
 		}
 		if filter.Limit > 0 {
 			params.Set("limit", strconv.Itoa(filter.Limit))
@@ -51,9 +56,11 @@ func (c *Client) GetIssue(id int, includeJournals bool) (*Issue, error) {
 	path := fmt.Sprintf("/issues/%d.json", id)
 	
 	params := url.Values{}
+	includes := []string{"children"}
 	if includeJournals {
-		params.Set("include", "journals")
+		includes = append(includes, "journals")
 	}
+	params.Set("include", strings.Join(includes, ","))
 
 	var response IssueResponse
 	if err := c.Get(path, params, &response); err != nil {

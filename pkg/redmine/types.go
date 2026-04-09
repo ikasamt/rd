@@ -16,6 +16,8 @@ type Issue struct {
 	DueDate        *string                `json:"due_date,omitempty"`
 	DoneRatio      int                    `json:"done_ratio"`
 	EstimatedHours *float64               `json:"estimated_hours,omitempty"`
+	Parent         *IssueParent           `json:"parent,omitempty"`
+	Children       []IssueChild           `json:"children,omitempty"`
 	CustomFields   []CustomField          `json:"custom_fields,omitempty"`
 	CreatedOn      time.Time              `json:"created_on"`
 	UpdatedOn      time.Time              `json:"updated_on"`
@@ -62,6 +64,16 @@ type CustomField struct {
 	ID    int         `json:"id"`
 	Name  string      `json:"name"`
 	Value interface{} `json:"value"`
+}
+
+type IssueParent struct {
+	ID int `json:"id"`
+}
+
+type IssueChild struct {
+	ID      int    `json:"id"`
+	Tracker Tracker `json:"tracker"`
+	Subject string `json:"subject"`
 }
 
 type Journal struct {

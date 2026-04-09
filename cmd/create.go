@@ -84,6 +84,11 @@ func createIssueFromFlags(cmd *cobra.Command, client *redmine.Client) error {
 		issue.PriorityID = priorityID
 	}
 
+	parentID, _ := cmd.Flags().GetInt("parent")
+	if parentID > 0 {
+		issue.ParentIssueID = parentID
+	}
+
 	statusID, _ := cmd.Flags().GetInt("status")
 	if statusID > 0 {
 		issue.StatusID = statusID
@@ -192,6 +197,7 @@ func init() {
 	createCmd.Flags().Int("tracker", 0, "Tracker ID")
 	createCmd.Flags().Int("priority", 0, "Priority ID")
 	createCmd.Flags().Int("status", 0, "Status ID")
+	createCmd.Flags().Int("parent", 0, "Parent issue ID")
 	createCmd.Flags().String("start-date", "", "Start date (YYYY-MM-DD)")
 	createCmd.Flags().String("due-date", "", "Due date (YYYY-MM-DD)")
 	createCmd.Flags().StringSlice("field", []string{}, "Custom field (format: name=value)")

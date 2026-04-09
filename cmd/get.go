@@ -70,6 +70,10 @@ func printIssueDetail(issue *redmine.Issue) error {
 		fmt.Printf("Assigned to: -\n")
 	}
 
+	if issue.Parent != nil {
+		fmt.Printf("Parent:      #%d\n", issue.Parent.ID)
+	}
+
 	if issue.StartDate != nil {
 		fmt.Printf("Start Date:  %s\n", *issue.StartDate)
 	}
@@ -90,6 +94,14 @@ func printIssueDetail(issue *redmine.Issue) error {
 		fmt.Println("\nCustom Fields:")
 		for _, cf := range issue.CustomFields {
 			fmt.Printf("  %s: %v\n", cf.Name, cf.Value)
+		}
+	}
+
+	// 子チケット
+	if len(issue.Children) > 0 {
+		fmt.Println("\nChild Issues:")
+		for _, child := range issue.Children {
+			fmt.Printf("  #%d [%s] %s\n", child.ID, child.Tracker.Name, child.Subject)
 		}
 	}
 
